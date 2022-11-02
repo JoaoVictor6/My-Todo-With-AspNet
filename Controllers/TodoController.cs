@@ -37,6 +37,7 @@ namespace MyTodo.Controllers {
     [HttpPost]
     [Route("todos")]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     public ActionResult<Todo> CreateTodo(
       [FromServices] AppDbContext context, 

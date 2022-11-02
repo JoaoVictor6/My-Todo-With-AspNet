@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
+WORKDIR /app
+
+COPY *.csproj /app
+RUN dotnet restore
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["dotnet", "watch"]
