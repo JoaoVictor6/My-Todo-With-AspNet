@@ -1,5 +1,11 @@
 services: 
-  api:
-    build: .
+  my-todo-list-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
     ports: 
-      - 8080:80
+      - 5000:5000
+    container_name: MyTodoListDev
+    volumes:
+      - .:/app
+    command: dotnet watch
