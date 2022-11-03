@@ -15,7 +15,7 @@ A idéia é ir aplicando conceitos que já conheço nessa nova stack. Aqui vai a
   Seria bem interessante testar o fluxo, tenho pouquissima experiência com isso 
   e acredito que seria um otimo desafio :)
 
-- [ ] Docker
+- [x] Docker
 
   Rodar a aplicação em docker.
 

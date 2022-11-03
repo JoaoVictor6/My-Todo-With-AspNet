@@ -15,4 +15,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="app.db" />
+  </ItemGroup>
+
 </Project>
