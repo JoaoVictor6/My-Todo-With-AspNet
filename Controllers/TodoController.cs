@@ -6,7 +6,15 @@ using MyTodo.ViewModels;
 namespace MyTodo.Controllers {
   [ApiController]
   [Route("v1")]
-  public class TodoController : ControllerBase{
+  public class TodoController : ControllerBase
+  {
+    private readonly AppDbContext _context;
+
+    public TodoController(AppDbContext context)
+    {
+      _context = context;
+    }
+    
     /**
      * <summary>
      * Get all todos
@@ -17,8 +25,8 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(typeof(List<Todo>), 200)]
     [Route("todos")]
     [Produces("text/json")]
-    public List<Todo> Get( [FromServices] AppDbContext context) {
-      var todos = context
+    public List<Todo> Get() {
+      var todos = _context
         .Todos
         .ToList();
       return todos;
@@ -35,11 +43,8 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Produces("text/json")]
-    public ActionResult<Todo> GetById (
-      [FromServices] AppDbContext context, 
-      [FromRoute] int id
-    ) {
-      var todo = context
+    public ActionResult<Todo> GetById ([FromRoute] int id) {
+      var todo = _context
         .Todos
         .FirstOrDefault(todo => todo.Id == id);
 
@@ -64,7 +69,6 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status201Created)]
     [Produces("text/json")]
     public ActionResult<Todo> CreateTodo(
-      [FromServices] AppDbContext context, 
       [FromBody] CreateTodoViewModel modelTodo
     ) {
       if(!ModelState.IsValid) {
@@ -77,8 +81,8 @@ namespace MyTodo.Controllers {
       };
 
       try {
-        context.Todos.Add(todo);
-        context.SaveChanges();
+        _context.Todos.Add(todo);
+        _context.SaveChanges();
 
         return Created($"v1/todos/{todo.Id}", todo);
       } catch {
@@ -104,7 +108,6 @@ namespace MyTodo.Controllers {
     [Produces("text/json")]
     public ActionResult<Todo> PutTodo(
       [FromRoute] int id,
-      [FromServices] AppDbContext context,
       [FromBody] CreateTodoViewModel modelTodo
     ) {
       if (!ModelState.IsValid) {
@@ -112,7 +115,7 @@ namespace MyTodo.Controllers {
       }
 
       try {
-        var todo = context
+        var todo = _context
           .Todos
           .FirstOrDefault(todo => todo.Id == id);
 
@@ -122,8 +125,8 @@ namespace MyTodo.Controllers {
 
         todo.Title = modelTodo.Title;
 
-        context.Todos.Update(todo);
-        context.SaveChanges();
+        _context.Todos.Update(todo);
+        _context.SaveChanges();
       
         return todo;
       } catch {
@@ -147,12 +150,11 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [Produces("text/json")]
     public ActionResult<Todo> DeleteTodo(
-      [FromRoute] int id,
-      [FromServices] AppDbContext context
+      [FromRoute] int id
     ) {
 
       try {
-        var todo = context
+        var todo = _context
           .Todos
           .FirstOrDefault(todo => todo.Id == id);
         
@@ -160,8 +162,8 @@ namespace MyTodo.Controllers {
           return NotFound();
         }
 
-        context.Remove<Todo>(todo);
-        context.SaveChanges();
+        _context.Remove<Todo>(todo);
+        _context.SaveChanges();
 
         return StatusCode(202);
       } catch {
