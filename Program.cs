@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MyTodo.Data;
 using System.Reflection;
+using MyTodo.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,6 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     options.RoutePrefix = string.Empty;
 });
-
+app.UseMiddleware(typeof(ErrorHandling));
 app.MapControllers();
 app.Run();
