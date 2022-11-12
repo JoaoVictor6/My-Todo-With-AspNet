@@ -1,6 +1,9 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using MyTodo.Models;
 using MyTodo.Data;
+using MyTodo.Services;
+using MyTodo.Utils;
 using MyTodo.ViewModels;
 
 namespace MyTodo.Controllers {
@@ -9,10 +12,11 @@ namespace MyTodo.Controllers {
   public class TodoController : ControllerBase
   {
     private readonly AppDbContext _context;
-
+    private readonly TodoService _todoService;
     public TodoController(AppDbContext context)
     {
       _context = context;
+      _todoService = new TodoService(_context);
     }
     
     /**
@@ -24,12 +28,10 @@ namespace MyTodo.Controllers {
     [HttpGet]
     [ProducesResponseType(typeof(List<Todo>), 200)]
     [Route("todos")]
-    [Produces("text/json")]
-    public List<Todo> Get() {
-      var todos = _context
-        .Todos
-        .ToList();
-      return todos;
+    [Produces("application/json")]
+    public List<Todo> Get()
+    {
+      return _todoService.List();
     }
     /**
      * <summary>
@@ -42,15 +44,10 @@ namespace MyTodo.Controllers {
     [Route("todos/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Produces("text/json")]
-    public ActionResult<Todo> GetById ([FromRoute] int id) {
-      var todo = _context
-        .Todos
-        .FirstOrDefault(todo => todo.Id == id);
-
-      if(todo == null) {
-        return NotFound(); 
-      };
+    [Produces("application/json")]
+    public ActionResult<Todo> GetById ([FromRoute] int id)
+    {
+      var todo = _todoService.GetById(id);
       return todo;
     }
     
@@ -67,27 +64,16 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [Produces("text/json")]
+    [Produces("application/json")]
     public ActionResult<Todo> CreateTodo(
       [FromBody] CreateTodoViewModel modelTodo
     ) {
       if(!ModelState.IsValid) {
         return BadRequest();
       }
+      var todo = _todoService.create(modelTodo);
 
-      var todo = new Todo {
-        Done = false,
-        Title = modelTodo.Title,
-      };
-
-      try {
-        _context.Todos.Add(todo);
-        _context.SaveChanges();
-
-        return Created($"v1/todos/{todo.Id}", todo);
-      } catch {
-        return StatusCode(503);
-      }
+      return StatusCode(StatusCodes.Status201Created, todo);
     }
     /**
      * <summary>
@@ -105,34 +91,19 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    [Produces("text/json")]
+    [Produces("application/json")]
     public ActionResult<Todo> PutTodo(
       [FromRoute] int id,
       [FromBody] CreateTodoViewModel modelTodo
     ) {
-      if (!ModelState.IsValid) {
-        return BadRequest();
+      if (!ModelState.IsValid)
+      {
+        throw new AppError(HttpStatusCode.BadRequest, "Invalid title field");
       }
-
-      try {
-        var todo = _context
-          .Todos
-          .FirstOrDefault(todo => todo.Id == id);
-
-        if(todo == null) {
-          return NotFound();
-        }
-
-        todo.Title = modelTodo.Title;
-
-        _context.Todos.Update(todo);
-        _context.SaveChanges();
       
-        return todo;
-      } catch {
-        return StatusCode(503);
-      }
+      var newTodo = _todoService.EditTodo(id, modelTodo);
 
+      return StatusCode(StatusCodes.Status202Accepted, newTodo);
     }
     /**
      * <summary>
@@ -148,27 +119,14 @@ namespace MyTodo.Controllers {
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    [Produces("text/json")]
+    [Produces("application/json")]
     public ActionResult<Todo> DeleteTodo(
       [FromRoute] int id
-    ) {
-
-      try {
-        var todo = _context
-          .Todos
-          .FirstOrDefault(todo => todo.Id == id);
-        
-        if(todo == null) {
-          return NotFound();
-        }
-
-        _context.Remove<Todo>(todo);
-        _context.SaveChanges();
-
-        return StatusCode(202);
-      } catch {
-        return StatusCode(503);
-      }
+    )
+    {
+      var todo = _todoService.DeleteTodo(id);
+      
+      return StatusCode(StatusCodes.Status202Accepted, todo);
     }
   }
 }
