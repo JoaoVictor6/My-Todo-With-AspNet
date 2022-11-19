@@ -1,6 +1,7 @@
 using System.Net;
 using MyTodo.Utils;
 using Newtonsoft.Json;
+# pragma warning disable CS1591
 
 namespace MyTodo.Middlewares;
 

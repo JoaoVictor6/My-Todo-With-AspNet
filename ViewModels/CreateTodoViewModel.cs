@@ -1,7 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-
+# pragma warning disable CS1591
 namespace MyTodo.ViewModels {
   public class CreateTodoViewModel {
-    public string Title {get; set;}
+    public string Title {get; set;} = string.Empty;
   }
 }

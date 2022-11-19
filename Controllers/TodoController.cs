@@ -6,6 +6,7 @@ using MyTodo.Services;
 using MyTodo.Utils;
 using MyTodo.ViewModels;
 
+# pragma warning disable CS1591
 namespace MyTodo.Controllers {
   [ApiController]
   [Route("v1")]
@@ -38,12 +39,12 @@ namespace MyTodo.Controllers {
      *  Get specific todo item
      * </summary>
      * <response code="200">Return a todo item</response>
-     * <response code="400">Return 404 error</response>
+     * <response code="404">Return 404 error</response>
      */
     [HttpGet]
     [Route("todos/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status404NotFound)]
     [Produces("application/json")]
     public ActionResult<Todo> GetById ([FromRoute] int id)
     {
@@ -55,14 +56,16 @@ namespace MyTodo.Controllers {
      * <summary>
      *  Create a todo item
      * </summary>
+     * <param name="modelTodo">Schema for create a Todo</param>
      * <response code="503">Return 503 error, this service was unavailable</response>
      * <response code="400">Return 400 error, something is wrong in request</response>
      * <response code="201">Return created status with created item</response>
+     * <returns> Todo </returns>
      */
-    [HttpPost]
+    [HttpPost] 
     [Route("todos")]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [Produces("application/json")]
     public ActionResult<Todo> CreateTodo(
@@ -80,17 +83,18 @@ namespace MyTodo.Controllers {
      *   Edit specific item
      * </summary>
      * <param name="id">The item identification</param>
-     * <response code="202">Return status 202, the item has been edited</response>
+     * <param name="modelTodo"> The body schema </param>
+     * <response code="200">Return status 200, the item has been edited</response>
      * <response code="400">Return 400 error, something is wrong in request</response>
      * <response code="404">Return 404 error, item not found</response>
      * <response code="503">Return 503 error, this service was unavailable</response>
      */
     [HttpPut]
     [Route("todos/{id}")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status503ServiceUnavailable)]
     [Produces("application/json")]
     public ActionResult<Todo> PutTodo(
       [FromRoute] int id,
@@ -103,22 +107,22 @@ namespace MyTodo.Controllers {
       
       var newTodo = _todoService.EditTodo(id, modelTodo);
 
-      return StatusCode(StatusCodes.Status202Accepted, newTodo);
+      return StatusCode(StatusCodes.Status200OK, newTodo);
     }
     /**
      * <summary>
      *  Delete specific item
      * </summary>
      * <param name="id">The item identification</param>
-     * <response code="202">Return status 202, the item has been deleted</response>
+     * <response code="200">Return status 200, the item has been deleted</response>
      * <response code="404">Return 404 error, item not found</response>
      * <response code="503">Return 503 error, this service was unavailable</response>
      */
     [HttpDelete]
     [Route("todos/{id}")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(IAppError), StatusCodes.Status503ServiceUnavailable)]
     [Produces("application/json")]
     public ActionResult<Todo> DeleteTodo(
       [FromRoute] int id
