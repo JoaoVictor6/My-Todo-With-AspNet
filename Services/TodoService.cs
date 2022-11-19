@@ -1,12 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.VisualBasic;
 using MyTodo.Data;
 using MyTodo.Models;
 using MyTodo.Utils;
 using MyTodo.ViewModels;
-
+#pragma warning disable CS1591
 namespace MyTodo.Services;
 
 public class TodoService
@@ -44,10 +41,10 @@ public class TodoService
     
     if (targetTodo == null)
     {
-      notFoundError();
+      throw notFoundError();
     }
 
-    return (Todo)targetTodo;
+    return targetTodo;
   }
   public List<Todo> List()
   {
@@ -64,7 +61,7 @@ public class TodoService
       serviceUnavailable("list");
     }
 
-    if (todos == null)
+    if (todos is null)
     {
       throw notFoundError();
     }
@@ -80,6 +77,7 @@ public class TodoService
     }
     catch (Exception err)
     {
+      Console.WriteLine(err);
       throw new AppError(HttpStatusCode.InternalServerError, "Is not possible create item");
     }
     return todoInstance;
@@ -90,9 +88,9 @@ public class TodoService
       .Todos
       .FirstOrDefault(todo => todo.Id == id);
 
-    if (targetTodo == null)
+    if (targetTodo is null)
     {
-      notFoundError();
+      throw notFoundError();
     }
     targetTodo.Title = todo.Title;
 
@@ -114,7 +112,7 @@ public class TodoService
       .Todos
       .FirstOrDefault(currentTodo => currentTodo.Id == id);
     
-    if(todo == null) notFoundError();
+    if(todo == null) throw notFoundError();
 
     try
     {
