@@ -456,6 +456,3 @@ $RECYCLE.BIN/
 # In-Memory Database
 *.db
 *.db-*
-
-# Enviroments var
-.env*
