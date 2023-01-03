@@ -19,7 +19,7 @@ A idéia é ir aplicando conceitos que já conheço nessa nova stack. Aqui vai a
 
   Rodar a aplicação em docker.
 
-- [ ] Documentação
+- [x] Documentação
 
   Dei uma olhada e vi que existe um ótimo suporte ao [swagger](https://swagger.io/), 
   espero conseguir adicionar essa feature.
