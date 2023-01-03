@@ -10,12 +10,11 @@ on:
     branches: [ main ]
 
 jobs:
-  
   build:
     
     name: Build Image
     runs-on: ubuntu-latest
-
+    environment: secrets
    
     steps:
 
