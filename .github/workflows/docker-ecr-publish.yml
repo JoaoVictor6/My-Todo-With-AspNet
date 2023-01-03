@@ -1,6 +1,8 @@
 name: Deploy to ECR
 
-permissions: read-all
+permissions:
+  id-token: write
+  contents: read
 
 on:
  
