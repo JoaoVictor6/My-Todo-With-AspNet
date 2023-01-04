@@ -1,4 +1,4 @@
-services:
+services: 
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -22,22 +22,19 @@ services:
       - .env
     depends_on:
       - postgres
-  proxy: 
-    build: proxy
-    ports:
-      - 80:80
-    depends_on:
-      - my-todo-list-api
-    volumes:
-      - ./proxy:/etc/nginx/conf.d
-    restart: always
   my-todo-list-api:
     build:
       context: .
+      dockerfile: Dockerfile.dev
     ports: 
-      - 5000
+      - 5000:5000
     container_name: MyTodoListDev
+    volumes:
+      - .:/app
     env_file:
       - .env
+    environment:
+      - DOTNET_WATCH_RESTART_ON_RUDE_EDIT=1
+    command: dotnet watch
     depends_on:
       - postgres
